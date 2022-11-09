@@ -1,0 +1,14 @@
+{
+    "name": "fiea/idigital",
+    "description": "Pacote em PHP para fazer a conexao com o SSO do I-DIGITAL do sistema FIEA",
+    "type": "library",
+    "require": {
+        "firebase/php-jwt": "6.3"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Fiea\\": "src/"
+        }
+    }
+}
