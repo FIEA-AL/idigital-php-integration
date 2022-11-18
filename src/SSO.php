@@ -135,7 +135,11 @@ class SSO
         $url .= 'scope=' . 'profile+openid' . '&';
         $url .= 'code_challenge_method=S256&';
         $url .= 'code_challenge=' . $code_challenge;
-        //$url .= 'code_verifier=' . $code_verifier;
+
+        if(!isset($_SESSION))
+        {
+            session_start();
+        }
 
         $_SESSION['code_verifier'] = $code_verifier;
         $_SESSION['code_challenge'] = $code_challenge;
@@ -146,53 +150,14 @@ class SSO
     }
 
     /**
-     * Busca o id_token na seção e válida o mesmo usando as chaves JWKs que vem do .well-known
-     * @return object|null
-     */
-    public function checkToken()
-    {
-        $id_token = $_SESSION['id_token'];
-        if (!$id_token) return null;
-
-        try {
-            $seperate_token = explode('.', $id_token);
-            if (count($seperate_token) <= 0) {
-                return null;
-            }
-            $header = base64_decode($seperate_token[0]);
-            $header = json_decode($header, true);
-
-            $alg = $header['alg'] ?? 'RS256';
-            $kid = $header['kid'] ?? "";
-            if (!$kid) {
-                return null;
-            }
-
-            $public_key = null;
-            foreach ($this->keys as $value) {
-                if ($value['kid'] == $kid && $value['alg'] == $alg) {
-                    $public_key = $value;
-                }
-            }
-
-            $jwk = JWK::parseKey($public_key);
-            $payload = JWT::decode($id_token, $jwk);
-
-            return $payload;
-        } catch (Exception $e) {
-            return null;
-        }
-    }
-
-    /**
      * Realiza um POST request no SSO para buscar os tokens do usuário, usando o CODE
      * @param string $code
      * @return array
      */
     public function signInWithCode($code)
     {
-        $code_verifier = $_SESSION['code_verifier'];
-        $code_challenge = $_SESSION['code_challenge'];
+        $code_verifier = $_SESSION['code_verifier'] ?? "";
+        $code_challenge = $_SESSION['code_challenge'] ?? "";
 
         $body  = "grant_type=authorization_code";
         $body .= "&redirect_uri=" . $this->redirect_uri;
@@ -220,43 +185,31 @@ class SSO
         curl_close($ch);
 
         $result = json_decode($response, true);
-        if(isset($result['access_token'])){
-            $_SESSION['access_token'] = $result['access_token'];
+        if(!isset($result['id_token'])){
+            return ['success' => false, 'result' => 'ID Token não informado'];
         }
-        if(isset($result['expires_in'])){
-            $_SESSION['expires_in'] = $result['expires_in'];
-        }
-        if(isset($result['token_type'])){
-            $_SESSION['token_type'] = $result['token_type'];
-        }
-        if(isset($result['id_token'])){
-            $_SESSION['id_token'] = $result['id_token'];
-            $payload = $this->checkToken();
-            if (!isset($payload)) {
-                $this->logout();
-                return ['success' => false, 'result' => 'Token inválido'];
-            }
-            if ($payload->sub ?? "") {
-                $_SESSION['nome'] = $payload->displayName ?? "";
-                $_SESSION['user_id'] = $payload->sub ?? "";
-                $this->getProfile();
-            }
-        }
+
+        $sessionHelper = new SessionHelper($result['id_token'], $this->keys);
+        $sessionHelper->set('id_token', $result['id_token']);
+        $sessionHelper->set('access_token', $result['access_token']);
+        $sessionHelper->set('expires_in', $result['expires_in'] ?? "");
+        $sessionHelper->set('token_type', $result['token_type'] ?? '');
+
+        $this->refreshUser($sessionHelper->payload);
+       
         return ['success' => true, 'result' => true];
     }
 
     public function getProfile()
     {
-        
-        $user_id = $_SESSION['user_id'];
-        $access_token = $_SESSION['access_token'];
+        $session = new SessionHelper();
 
         $ch = curl_init();
         curl_setopt_array($ch, [
-            CURLOPT_URL => $this->provider . '/user/' . $user_id,
+            CURLOPT_URL => $this->provider . '/user/me',
             CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
-                'Authorization: Bearer '.$access_token
+                'Authorization: Bearer '.$session->get('access_token')
             ],
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
@@ -276,39 +229,61 @@ class SSO
                 'value' => $email['value']
             ];
         }
-
-        if (isset($user['displayame'])) {
-            $_SESSION['nome'] = $user['name']['displayname'];
+        $sessionHelper = new SessionHelper();
+        if (isset($user['name']['givenName'])) {
+            $sessionHelper->set('firstname', $user['name']['givenName']);
+        }
+        if (isset($user['name']['familyName'])) {
+            $sessionHelper->set('lastname', $user['name']['familyName']);
+        }
+        if (isset($user['displayname'])) {
+            $sessionHelper->set('displayname', $user['name']['displayname']);
         }
         if (isset($user['picture'])) {
-            $_SESSION['picture'] = $user['picture'];
+            $sessionHelper->set('picture', $user['picture']);
         }
         if (count($emails) > 0) {
-            $_SESSION['email'] = $emails[0]['value'];
+            $sessionHelper->set('email', isset($emails[0]['value']) ? $emails[0]['value'] : '');
         }
+
+        $sessionHelper->set('groups',   $user['groups'] ?? []);
+        $sessionHelper->set('services', $user['services'] ?? []);
         
         return ['success' => true, 'result' => $user];
     }
 
     /**
+     * Atualiza um usuário usando o payload gerado
+     * @param object $request
+     * @return bool
+     */
+    public function refreshUser($payload): bool
+    {
+        $sessionHelper = new SessionHelper();
+        if ($payload->sub ?? "") {
+            $sessionHelper->set('firstname',   $payload->givenName ?? "");
+            $sessionHelper->set('lastname',    $payload->familyName ?? "");
+            $sessionHelper->set('displayname', $payload->displayName ?? "");
+            $sessionHelper->set('user_id',     $payload->sub ?? "");
+            $this->getProfile();
+        }
+
+        return true;
+    }
+
+    /**
      * Faz a limpeza da sessão e retornar a URL para logout do SSO
+     * @param bool $clean
+     * @param string $logout_token
      * @return string
      */
-    public function logout()
+    public function logout($clean = false, $logout_token = "")
     {        
-        unset($_SESSION['access_token']);
-        unset($_SESSION['expires_in']);
-        unset($_SESSION['id_token']);
-        unset($_SESSION['token_type']);
-        unset($_SESSION['code_verifier']);
-        unset($_SESSION['code_challenge']);
-        unset($_SESSION['state']);
-        unset($_SESSION['nonce']);
-        unset($_SESSION['firstname']);
-        unset($_SESSION['lastname']);
-        unset($_SESSION['displayname']);
-        unset($_SESSION['picture']);
-        unset($_SESSION['user_id']);
+        if($clean)
+        {
+            $session = new SessionHelper($logout_token, $this->keys);
+            $session->destroy();
+        }
 
         $url = $this->provider . '/sso/oidc/session/end?';
         $url .= 'post_logout_redirect_uri=' . $this->logout_redirect_uri . '&';
