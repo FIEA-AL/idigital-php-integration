@@ -318,7 +318,6 @@ class SSO
     /**
      * Faz a limpeza da sessão
      * @param string $logout_token
-     * @return string
      */
     public function logout($logout_token = "")
     {        
