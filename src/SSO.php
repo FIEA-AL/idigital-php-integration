@@ -317,7 +317,6 @@ class SSO
 
     /**
      * Faz a limpeza da sessão
-     * @param bool $clean
      * @param string $logout_token
      * @return string
      */
