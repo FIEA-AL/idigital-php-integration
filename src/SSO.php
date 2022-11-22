@@ -302,24 +302,32 @@ class SSO
     }
 
 
-    /**
-     * Faz a limpeza da sessão e retornar a URL para logout do SSO
-     * @param bool $clean
-     * @param string $logout_token
+/**
+     * retornar a URL para logout do SSO
      * @return string
      */
-    public function logout($clean = false, $logout_token = "")
+    public function urlLogout()
     {        
-        if($clean)
-        {
-            $session = new SessionHelper($logout_token, $this->keys);
-            $session->destroy();
-        }
-
         $url = $this->provider . '/sso/oidc/session/end?';
         $url .= 'post_logout_redirect_uri=' . $this->logout_redirect_uri . '&';
         $url .= 'client_id=' . $this->client_id;
 
         return $url;
+    }
+
+    /**
+     * Faz a limpeza da sessão
+     * @param bool $clean
+     * @param string $logout_token
+     * @return string
+     */
+    public function logout($logout_token = "")
+    {        
+        if($this->use_backchannel){
+            $session = new SessionHelper($logout_token, $this->keys, $this->use_backchannel);
+        }else{
+            $session = new SessionHelper();
+        }
+        $session->destroy();
     }
 }
