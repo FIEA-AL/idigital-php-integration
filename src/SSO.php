@@ -288,6 +288,21 @@ class SSO
     }
 
     /**
+     * Busca o usuário ativo
+     * @return object|null
+     */
+    public function getUser()
+    {
+        $sessionHelper = new SessionHelper(null, $this->keys);
+        if(!$sessionHelper->get('id_token')){
+            return null;
+        }
+
+        return $sessionHelper->verifyToken();
+    }
+
+
+    /**
      * Faz a limpeza da sessão e retornar a URL para logout do SSO
      * @param bool $clean
      * @param string $logout_token

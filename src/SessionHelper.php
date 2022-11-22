@@ -113,7 +113,7 @@ class SessionHelper
     /**
      * Pegar o valor de sessão
      * @param string $key
-     * @return mixed
+     * @return mixed|null
      */
     public function get($key)
     {
