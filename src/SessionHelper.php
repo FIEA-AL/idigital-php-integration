@@ -26,8 +26,9 @@ class SessionHelper
      * Inicia as configurações para gerenciar a sessão do SSO
      * @param string|null $id_token
      * @param array  $keys
+     * @param bool $use_backchannel
      */
-    public function __construct($id_token = null, $keys = [])
+    public function __construct($id_token = null, $keys = [], $use_backchannel = false)
     {
         $this->keys = $keys;
         if(isset($id_token))
@@ -38,8 +39,18 @@ class SessionHelper
                 throw new Exception('ID Token informado é inválido');
             }
             $this->payload = $payload;
-            $sid = str_replace('_', '-', $payload->sid);
-            session_id($sid);
+
+            if($use_backchannel)
+            {
+                if(!isset($payload->sid)) {
+                    throw new Exception('SID não informado');
+                }
+                $sid = str_replace('_', '-', $payload->sid);
+                if(!isset($_SESSION)){
+                    session_destroy();
+                }
+                session_id($sid);
+            }
         }
 
         if(!isset($_SESSION))

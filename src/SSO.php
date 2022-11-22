@@ -29,6 +29,10 @@ class SSO
      */
     private $client_id;
     /**
+     * Resource
+     */
+    private $resource;
+    /**
      * Caminho para realizar o redirect
      * @var string
      */
@@ -43,6 +47,11 @@ class SSO
      * @var array
      */
     private $keys = [];
+    /**
+     * Verifica se usa o Backchannel
+     * @var bool 
+     */
+    private $use_backchannel = false;
     
     /**
      * Cria a instância da classe e busca no Well Known as configurações
@@ -50,13 +59,17 @@ class SSO
      * @param string $redirect_uri
      * @param string $client_id
      * @param string $logout_redirect_uri
+     * @param string $resource
+     * @param bool   $use_backchannel
      */
-    public function __construct($provider, $redirect_uri, $client_id, $logout_redirect_uri)
+    public function __construct($provider, $redirect_uri, $client_id, $logout_redirect_uri, $resource, $use_backchannel = false)
     {
         $this->provider = $provider;
         $this->redirect_uri = $redirect_uri;
         $this->client_id = $client_id;
         $this->logout_redirect_uri = $logout_redirect_uri;
+        $this->resource = $resource;
+        $this->use_backchannel = $use_backchannel;
         $this->getWellKnown();
     }
 
@@ -118,9 +131,10 @@ class SSO
 
     /**
      * Gera a URL para redirecionar a aplicação para o LOGIN no SSO
+     * @param string $scope
      * @return string
      */
-    public function generateRedirect()
+    public function generateRedirect($scope = 'profile+openid')
     {
         $code_verifier = bin2hex(random_bytes(64));
         $code_challenge = rtrim(strtr(base64_encode(hash('sha256', $code_verifier, true)), '+/', '-_'), '=');
@@ -132,9 +146,10 @@ class SSO
         $url .= 'client_id=' . $this->client_id . '&';
         $url .= 'nonce=' . $nonce . '&';
         $url .= 'state=' . $state . '&';
-        $url .= 'scope=' . 'profile+openid' . '&';
+        $url .= 'scope=' . $scope . '&';
         $url .= 'code_challenge_method=S256&';
         $url .= 'code_challenge=' . $code_challenge;
+        $url .= '&resource='.$this->resource;
 
         if(!isset($_SESSION))
         {
@@ -189,7 +204,7 @@ class SSO
             return ['success' => false, 'result' => 'ID Token não informado'];
         }
 
-        $sessionHelper = new SessionHelper($result['id_token'], $this->keys);
+        $sessionHelper = new SessionHelper($result['id_token'], $this->keys, $this->use_backchannel);
         $sessionHelper->set('id_token', $result['id_token']);
         $sessionHelper->set('access_token', $result['access_token']);
         $sessionHelper->set('expires_in', $result['expires_in'] ?? "");
@@ -219,6 +234,9 @@ class SSO
         $response = curl_exec($ch);
         curl_close($ch);
         $result = json_decode($response, true);
+
+        var_dump($result);
+        die();
 
         $user = $result['data']['items'][0];
         $emails = [];
@@ -260,14 +278,12 @@ class SSO
     public function refreshUser($payload): bool
     {
         $sessionHelper = new SessionHelper();
-        if ($payload->sub ?? "") {
-            $sessionHelper->set('firstname',   $payload->givenName ?? "");
-            $sessionHelper->set('lastname',    $payload->familyName ?? "");
-            $sessionHelper->set('displayname', $payload->displayName ?? "");
-            $sessionHelper->set('user_id',     $payload->sub ?? "");
-            $this->getProfile();
-        }
-
+        $sessionHelper->set('firstname',   $payload->givenName ?? "");
+        $sessionHelper->set('lastname',    $payload->familyName ?? "");
+        $sessionHelper->set('displayname', $payload->displayName ?? "");
+        $sessionHelper->set('user_id',     $payload->sub ?? "");
+        $sessionHelper->set('email',       $payload->email ?? "");
+        
         return true;
     }
 
