@@ -34,6 +34,9 @@ class SessionHelper
         if(isset($id_token))
         {
             $this->id_token = $id_token;
+            if(empty($this->keys)){
+                throw new Exception('Não foi possível buscar chaves no well know');
+            }
             $payload = $this->verifyToken();
             if(!isset($payload)) {
                 throw new Exception('ID Token informado é inválido');

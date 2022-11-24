@@ -126,7 +126,10 @@ class SSO
         $response = curl_exec($ch);
         curl_close($ch);
         $result = json_decode($response, true);
-        $this->keys = isset($result['keys'][0]) ? $result['keys'] : [];
+        if(empty($result['keys'])){
+            throw new Exception('Chaves do well known vázias');
+        }
+        $this->keys = $result['keys'] ;
     }
 
     /**
