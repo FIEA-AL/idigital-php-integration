@@ -111,7 +111,7 @@ class IDigital {
     /**
      * @throws IDigitalException
      */
-    public function logout(): void {
+    public function logout($callback): void {
         if ($this->isAuthenticated()->status) {
             $endSessionEndpoint = $this->discovery->end_session_endpoint;
             $url = IDigitalHelp::getParameterizedUrl($endSessionEndpoint, [
@@ -119,7 +119,14 @@ class IDigital {
                 ['client_id', $this->configs->clientId]
             ]);
 
+            // Destroy IDigital object
             IDigitalSession::destroy();
+
+            // Run logout callback
+            if (is_callable($callback)) {
+                $callback();
+            }
+
             header("Location: $url");
             exit;
         }
