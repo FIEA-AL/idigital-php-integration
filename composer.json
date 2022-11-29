@@ -1,9 +1,11 @@
 {
-    "name": "fiea/idigital",
-    "description": "Pacote em PHP para fazer a conexao com o SSO do I-DIGITAL do sistema FIEA",
+    "name": "fiea-al/idigital-php-integration",
+    "description": "IDigital OpenID Connect integration for PHP",
     "type": "library",
     "require": {
-        "firebase/php-jwt": "6.3"
+        "firebase/php-jwt": "6.3",
+        "ext-curl": "*",
+        "ext-json": "*"
     },
     "license": "MIT",
     "autoload": {
