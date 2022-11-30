@@ -8,7 +8,7 @@ class IDigitalDiscovery {
     public string $token_endpoint;
     public array $claims_supported;
     public array $scopes_supported;
-    public string $userinfo_endpoint;
+    public ?string $userinfo_endpoint;
     public string $end_session_endpoint;
     public array $claim_types_supported;
     public array $grant_types_supported;
