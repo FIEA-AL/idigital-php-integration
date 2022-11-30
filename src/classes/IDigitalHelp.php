@@ -6,8 +6,8 @@ use stdClass;
 
 class IDigitalHelp {
     public static function getParameterizedUrl(string $url, array $params): string {
-        $queryElement = fn(string $key, string $value) => $key . '=' . $value;
-        return $url . '/' . join('&', array_map($queryElement, $params));
+        $queryElement = fn(array $item) => $item[0] . '=' . $item[1];
+        return $url . '?' . join('&', array_map($queryElement, $params));
 	}
 
     /**
