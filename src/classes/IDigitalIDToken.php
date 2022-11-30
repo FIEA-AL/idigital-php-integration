@@ -1,8 +1,7 @@
 <?php
 
 namespace Fiea\classes;
-
-use function Fiea\functions\isJWT;
+use Fiea\classes\IDigitalHelp;
 use Firebase\JWT\JWK;
 use Firebase\JWT\JWT;
 use stdClass;
@@ -22,7 +21,7 @@ class IDigitalIDToken {
      * @throws IDigitalException
      */
     public static function verify(?string $token, ?string $nonce, $keys, $options): ?object {
-        if ($token !== null && isJWT($token) && $nonce != null) {
+        if ($token !== null && IDigitalHelp::isJWT($token)) {
             $decoded = explode('.', $token);
             $header = array_pop($decoded);
             $header = base64_decode($header);
