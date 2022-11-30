@@ -110,7 +110,7 @@ class IDigitalToken {
     private static function getData(?string $token, int $offset): ?object {
         if ($token !== null && IDigitalHelp::isJWT($token)) {
             $header = array_slice(explode('.', $token), $offset, 1);
-            $header = base64_decode($header);
+            $header = base64_decode(array_pop($header));
             return json_decode($header);
         }
 
