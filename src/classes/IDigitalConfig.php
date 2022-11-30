@@ -20,6 +20,8 @@ class IDigitalConfig {
         $this->clientId = $configs['clientId'];
         $this->redirectUri = $configs['redirectUri'];
         $this->applicationHost = $configs['applicationHost'];
+
+        // Adding Default options for oauth2 authorization code flow
         $this->responseType = $configs['responseType'] ?? 'code';
         $this->applicationType = $configs['applicationType'] ?? 'web';
         $this->grantType = $configs['grantType'] ?? 'authorization_code';

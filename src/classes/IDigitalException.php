@@ -13,7 +13,7 @@ class IDigitalException extends Exception {
 
     public function __construct($code, $message, Throwable $previous = null) {
         //  Require an array of HTTP status code
-        $HTTP_STATUS = require_once('../utils/http.status.php');
+        $HTTP_STATUS = require_once(__DIR__.'/../utils/http.status.php');
 
         $format = 'd/m/Y H:i:s';
         $date = new DateTimeImmutable();

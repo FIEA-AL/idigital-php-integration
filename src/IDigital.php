@@ -19,9 +19,7 @@ class IDigital {
 	private object $jwks;
 
     private function __construct(IDigitalConfig $configs) {
-        // Default options for oauth2 authorization code flow
         $this->configs = $configs;
-
     }
 
     public static function create(IDigitalConfig $configs): IDigital {
