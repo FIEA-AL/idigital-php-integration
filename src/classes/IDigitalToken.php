@@ -29,6 +29,11 @@ class IDigitalToken {
             throw new IDigitalException(400, $message);
         }
 
+        if (empty($header->kid)) {
+            $message = IDigitalMessage::$JWT_WITHOUT_KID;
+            throw new IDigitalException(400, $message);
+        }
+
         return $header;
     }
 
@@ -69,9 +74,9 @@ class IDigitalToken {
             }
         }
 
-        if (empty($kid) || $publicKey == null) {
-            $message = IDigitalMessage::$JWT_WITHOUT_KID;
-            throw new IDigitalException(400, $message);
+        if ($publicKey == null) {
+            $message = IDigitalMessage::$COULD_NOT_FIND_PUBLIC_KEYS;
+            throw new IDigitalException(500, $message);
         }
 
         return $publicKey;
@@ -119,9 +124,9 @@ class IDigitalToken {
      */
     private static function getData(?string $token, int $offset): ?object {
         if ($token !== null && IDigitalHelp::isJWT($token)) {
-            $header = array_slice(explode('.', $token), $offset, 1);
-            $header = base64_decode(array_pop($header));
-            return json_decode($header);
+            $data = array_slice(explode('.', $token), $offset, 1);
+            $data = base64_decode(array_pop($data));
+            return json_decode($data);
         }
 
         self::isNotJWT();

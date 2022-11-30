@@ -16,5 +16,5 @@ class IDigitalMessage {
     public static string $JWT_WITHOUT_TYP = 'O JWT não possui uma propriedade typ válida no cabeçalho.';
     public static string $COULD_NOT_GENERATE_BYTES = 'O servidor não conseguiu gerar valores aleatórios.';
     public static string $HTTP_ERROR = 'Não foi possível realizar a requisição para o servidor de destino.';
-    public static string $REQUIRED_USER_FOR_LOGOUT = 'O usuário precisa estar autenticado para fazer logout.';
+    public static string $COULD_NOT_FIND_PUBLIC_KEYS = 'O servidor não conseguiu encontrar chaves públicas.';
 }
