@@ -28,8 +28,8 @@ class IDigitalSession {
                 session_start();
             }
 
-            $idigital = new stdClass();
-            $_SESSION[self::$NAME] = $idigital;
+            // IDigital session object
+            $_SESSION[self::$NAME] = [];
         }
     }
 
