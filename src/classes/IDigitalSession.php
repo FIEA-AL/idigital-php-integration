@@ -35,7 +35,7 @@ class IDigitalSession {
 
     public static function destroy() {
         if (self::alreadyExists()) {
-            unset($_SESSION[self::get(self::$NAME)]);
+            unset($_SESSION[self::$NAME]);
         }
     }
 }
