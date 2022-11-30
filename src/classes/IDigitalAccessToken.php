@@ -7,16 +7,6 @@ use Firebase\JWT\JWT;
 use stdClass;
 
 class IDigitalAccessToken extends IDigitalToken {
-    public object $payload;
-    public object $header;
-    public string $token;
-
-    private function __construct(string $token, $jwt) {
-        $this->payload = $jwt->payload;
-        $this->header = $jwt->header;
-        $this->token = $token;
-    }
-
     /**
      * @throws IDigitalException
      */

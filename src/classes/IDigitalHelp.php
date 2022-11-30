@@ -16,23 +16,36 @@ class IDigitalHelp {
     }
 
     /**
-     * @throws Exception
+     * @throws IDigitalException
      */
     public static function getRandomBytes(int $bytes = 32): string {
-        return rtrim(strtr(base64_encode(bin2hex(random_bytes($bytes))), '+/', '-_'), '=');
+        try {
+            $randomBytes = random_bytes($bytes);
+            $hexadecimal = bin2hex($randomBytes);
+            $base64 = base64_encode($hexadecimal);
+            return rtrim(strtr($base64, '+/', '-_'), '=');
+        } catch (Exception $e) {
+            $message = IDigitalMessage::$COULD_NOT_GENERATE_BYTES;
+            throw new IDigitalException(500, $message);
+        }
 	}
 
     /**
-     * @throws Exception
+     * @throws IDigitalException
      */
     public static function getPkceKeysPair(): object {
-		$codeVerifier = self::getRandomBytes();
-        $sha256 = hash('sha256', $codeVerifier, true);
-        $codeChallenge = rtrim(strtr(base64_encode($sha256), '+/', '-_'), '=');
+        try {
+            $codeVerifier = self::getRandomBytes();
+            $sha256 = hash('sha256', $codeVerifier, true);
+            $codeChallenge = rtrim(strtr(base64_encode($sha256), '+/', '-_'), '=');
 
-        $pkce = new stdClass;
-        $pkce->codeVerifier = $codeVerifier;
-        $pkce->codeChallenge = $codeChallenge;
-        return $pkce;
+            $pkce = new stdClass;
+            $pkce->codeVerifier = $codeVerifier;
+            $pkce->codeChallenge = $codeChallenge;
+            return $pkce;
+        } catch (Exception $e) {
+            $message = IDigitalMessage::$COULD_NOT_GENERATE_PKCE;
+            throw new IDigitalException(500, $message);
+        }
     }
 }

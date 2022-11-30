@@ -3,6 +3,16 @@
 namespace Fiea\classes;
 
 class IDigitalToken {
+    public object $payload;
+    public object $header;
+    public string $token;
+
+    protected function __construct(string $token, $jwt) {
+        $this->payload = $jwt->payload;
+        $this->header = $jwt->header;
+        $this->token = $token;
+    }
+
     /**
      * @throws IDigitalException
      */
