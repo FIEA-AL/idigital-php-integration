@@ -109,7 +109,7 @@ class IDigital {
     /**
      * @throws IDigitalException
      */
-    public function logout($afterSessionDestroyFn): void {
+    public function logout($afterSessionDestroyFn = null): void {
         if ($this->isAuthenticated()->status) {
             $endSessionEndpoint = $this->discovery->end_session_endpoint;
             $url = IDigitalHelp::getParameterizedUrl($endSessionEndpoint, [

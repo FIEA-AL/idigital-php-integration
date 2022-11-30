@@ -57,7 +57,7 @@ class IDigitalToken {
     /**
      * @throws IDigitalException
      */
-    protected static function getPublicKeyByKid(string $kid, string $alg, $keys): ?object {
+    protected static function getPublicKeyByKid(?string $kid, ?string $alg, $keys): ?object {
         $publicKey = null;
 
         foreach ($keys->keys as $value) {
@@ -80,35 +80,35 @@ class IDigitalToken {
     /**
      * @throws IDigitalException
      */
-    protected static function verifyIssuer(string $value1, string $value2): void {
+    protected static function verifyIssuer(?string $value1, ?string $value2): void {
         self::verifyAttributesOfJWT($value1, $value2, IDigitalMessage::$DIVERGENT_ISSUER);
     }
 
     /**
      * @throws IDigitalException
      */
-    protected static function verifyClient(string $value1, string $value2): void {
+    protected static function verifyClient(?string $value1, ?string $value2): void {
         self::verifyAttributesOfJWT($value1, $value2, IDigitalMessage::$DIVERGENT_CLIENT_ID);
     }
 
     /**
      * @throws IDigitalException
      */
-    protected static function verifyAudience(string $value1, string $value2): void {
+    protected static function verifyAudience(?string $value1, ?string $value2): void {
         self::verifyAttributesOfJWT($value1, $value2, IDigitalMessage::$DIVERGENT_AUDIENCE);
     }
 
     /**
      * @throws IDigitalException
      */
-    protected static function verifyNonce(string $value1, string $value2): void {
+    protected static function verifyNonce(?string $value1, ?string $value2): void {
         self::verifyAttributesOfJWT($value1, $value2, IDigitalMessage::$DIVERGENT_NONCE);
     }
 
     /**
      * @throws IDigitalException
      */
-    private static function verifyAttributesOfJWT(string $value1, string $value2, string $message): void {
+    private static function verifyAttributesOfJWT(?string $value1, ?string $value2, string $message): void {
         if ($value1 == null || $value2 == null || $value1 != $value2) {
             throw new IDigitalException(400, $message);
         }
