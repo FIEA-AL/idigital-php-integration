@@ -22,6 +22,9 @@ class IDigital {
         $this->configs = $configs;
     }
 
+    /**
+     * @throws IDigitalException
+     */
     public static function create(IDigitalConfig $configs): IDigital {
         $instance = new IDigital($configs);
 		$instance->prepare();
@@ -128,11 +131,11 @@ class IDigital {
             header("Location: $url");
             exit;
         }
-
-        $message = IDigitalMessage::$REQUIRED_USER_FOR_LOGOUT;
-        throw new IDigitalException(500, $message);
     }
 
+    /**
+     * @throws IDigitalException
+     */
     private function getTokens(string $code): object {
         $tokenEndpoint = $this->discovery->token_endpoint;
         $body = IDigitalHelp::getParameterizedUrl($tokenEndpoint, [
@@ -150,12 +153,18 @@ class IDigital {
         return IDigitalHttp::getTokens($tokenEndpoint, $body);
     }
 
+    /**
+     * @throws IDigitalException
+     */
     private function prepare(): void {
         $this->discovery = $this->getDiscovery();
         $this->jwks = $this->getJwks();
         IDigitalSession::start();
     }
 
+    /**
+     * @throws IDigitalException
+     */
     private function getDiscovery(): IDigitalDiscovery {
         $issuer = $this->configs->issuer;
         $pathname = IDigitalDiscovery::$PATHNAME;
@@ -163,6 +172,9 @@ class IDigital {
         return IDigitalHttp::getDiscovery($url);
     }
 
+    /**
+     * @throws IDigitalException
+     */
     private function getJwks(): object {
         $url = $this->discovery->jwks_uri;
         return IDigitalHttp::getJwks($url);
