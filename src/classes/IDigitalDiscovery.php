@@ -36,10 +36,10 @@ class IDigitalDiscovery {
         $this->token_endpoint = $discovery->token_endpoint;
         $this->claims_supported = $discovery->claims_supported;
         $this->scopes_supported = $discovery->scopes_supported;
-        $this->userinfo_endpoint = $discovery->userinfo_endpoint;
         $this->end_session_endpoint = $discovery->end_session_endpoint;
         $this->claim_types_supported = $discovery->claim_types_supported;
         $this->grant_types_supported = $discovery->grant_types_supported;
+        $this->userinfo_endpoint = $discovery->userinfo_endpoint ?? null;
         $this->authorization_endpoint = $discovery->authorization_endpoint;
         $this->subject_types_supported = $discovery->subject_types_supported;
         $this->response_modes_supported = $discovery->response_modes_supported;

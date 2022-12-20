@@ -2,6 +2,8 @@
 
 namespace Fiea\classes;
 
+use Fiea\interfaces\IIDigitalSession;
+
 class IDigitalConfig {
     public string $issuer;
     public string $clientId;
@@ -11,6 +13,7 @@ class IDigitalConfig {
     public ?string $responseType;
     public string $applicationHost;
     public ?string $applicationType;
+    public ?IIDigitalSession $session;
     public ?string $codeChallengeMethod;
     public ?string $postLogoutRedirectUri;
     public ?string $tokenEndpointAuthMethod;
@@ -20,6 +23,7 @@ class IDigitalConfig {
         $this->clientId = $configs['clientId'];
         $this->redirectUri = $configs['redirectUri'];
         $this->applicationHost = $configs['applicationHost'];
+        $this->session = $configs['session'] ?? new IDigitalSession();
 
         // Adding Default options for oauth2 authorization code flow
         $this->responseType = $configs['responseType'] ?? 'code';
@@ -29,5 +33,9 @@ class IDigitalConfig {
         $this->codeChallengeMethod = $configs['codeChallengeMethod'] ?? 'S256';
         $this->tokenEndpointAuthMethod = $configs['tokenEndpointAuthMethod'] ?? 'none';
         $this->postLogoutRedirectUri = $configs['postLogoutRedirectUri'] ?? $this->issuer;
+    }
+
+    public function getSession(): IIDigitalSession {
+        return $this->session ?? $this->session = new IDigitalSession();
     }
 }

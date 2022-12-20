@@ -1,7 +1,6 @@
 <?php
 
 namespace Fiea\classes;
-use Fiea\classes\IDigitalHelp;
 use Firebase\JWT\JWK;
 use Firebase\JWT\JWT;
 use stdClass;

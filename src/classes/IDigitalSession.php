@@ -1,41 +1,50 @@
 <?php
 
 namespace Fiea\classes;
-use stdClass;
+use Fiea\interfaces\IIDigitalSession;
 
-class IDigitalSession {
-    private static string $NAME = 'idigital';
+class IDigitalSession implements IIDigitalSession {
+    private string $NAME = 'idigital';
 
-    public static function set(string $key, $value): void {
-        if (self::alreadyExists()) {
-            $_SESSION[self::$NAME][$key] = $value;
+    public function start(): void {
+        if (!$this->alreadyExists()) {
+            if(!isset($_SESSION)) session_start();
+            $_SESSION[$this->NAME] = [];
         }
     }
 
-    public static function get(string $key) {
-        if (self::alreadyExists()) {
-            return $_SESSION[self::$NAME][$key] ?? null;
+    public function destroy(): void {
+        if ($this->alreadyExists()) {
+            unset($_SESSION[$this->NAME]);
         }
     }
 
-    public static function alreadyExists(): bool {
-        return isset($_SESSION) && isset($_SESSION[self::$NAME]);
+    public function alreadyExists(): bool {
+        return isset($_SESSION) && isset($_SESSION[$this->NAME]);
     }
 
-    public static function start() {
-        if (!self::alreadyExists()) {
-            if(!isset($_SESSION))  {
-                session_start();
-            }
-
-            // IDigital session object
-            $_SESSION[self::$NAME] = [];
-        }
+    public function get(string $key, $default = null) {
+        if (!$this->alreadyExists()) $this->start();
+        $value = $_SESSION[$this->NAME][$key];
+        return $value ?? is_callable($default)
+            ? $default() : $default ?? null;
     }
 
-    public static function destroy() {
-        if (self::alreadyExists()) {
-            unset($_SESSION[self::$NAME]);
-        }
+    public function del(string $key): void {
+        if (!$this->alreadyExists()) $this->start();
+        unset($_SESSION[$this->NAME][$key]);
+    }
+
+    public function put(string $key, $value) {
+        if (!$this->alreadyExists()) $this->start();
+        $_SESSION[$this->NAME][$key] = $value;
+        return $this->get($key);
+    }
+
+    public function pull(string $key, $default = null) {
+        if (!$this->alreadyExists()) $this->start();
+        $value = $this->get($key, $default);
+        $this->del($key);
+        return $value;
     }
 }
