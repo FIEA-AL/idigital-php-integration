@@ -34,7 +34,7 @@ class IDigital {
     /**
      * @throws Exception
      */
-    public function authorize(?IIDigitalSession $session): void {
+    public function authorize(?IIDigitalSession $session): string {
         $authorizationEndpoint = $this->discovery->authorization_endpoint;
         $pkceKeysPair = IDigitalHelp::getPkceKeysPair();
         $nonce = IDigitalHelp::getRandomBytes();
@@ -47,7 +47,7 @@ class IDigital {
         $IDigitalSession->put('nonce', $nonce);
         $IDigitalSession->put('state', $state);
 
-        $url = IDigitalHelp::getParameterizedUrl($authorizationEndpoint, [
+        return IDigitalHelp::getParameterizedUrl($authorizationEndpoint, [
             ['code_challenge_method', $this->configs->codeChallengeMethod],
             ['scope', join('+', $this->configs->scopes)],
             ['code_challenge', $pkceKeysPair->codeChallenge],
@@ -58,9 +58,6 @@ class IDigital {
             ['nonce', $nonce],
             ['state', $state]
         ]);
-
-        header("Location: $url");
-        exit;
     }
 
     /**
@@ -116,7 +113,7 @@ class IDigital {
     /**
      * @throws IDigitalException
      */
-    public function logout(?IIDigitalSession $session, ?callable $afterSessionDestroyFn): void {
+    public function logout(?IIDigitalSession $session, ?callable $afterSessionDestroyFn): string {
         $IDigitalSession = $this->getSession($session);
 
         if ($this->isAuthenticated($IDigitalSession)->status) {
@@ -127,15 +124,14 @@ class IDigital {
             ]);
 
             // Destroy IDigital object
-            $IDigitalSession->destroy();
+            $IDigitalSession->flush();
 
             // Run function after session destroy
             if (is_callable($afterSessionDestroyFn)) {
                 $afterSessionDestroyFn();
             }
 
-            header("Location: $url");
-            exit;
+            return $url;
         }
     }
 

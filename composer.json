@@ -1,16 +1,37 @@
 {
     "name": "fiea-al/idigital-php-integration",
     "description": "IDigital OpenID Connect integration for PHP",
+    "version": "1.1.0",
     "type": "library",
+    "license": "MIT",
     "require": {
         "firebase/php-jwt": "6.3",
         "ext-curl": "*",
         "ext-json": "*"
     },
-    "license": "MIT",
     "autoload": {
         "psr-4": {
             "Fiea\\": "src/"
         }
-    }
+    },
+    "authors": [
+        {
+            "name": "Vitor Barcelos",
+            "email": "vitor@barcelos.dev.br",
+            "homepage": "https://www.linkedin.com/in/vitorbarcelos",
+            "role": "Developer"
+        },
+        {
+            "name": "Matheus Melo",
+            "email": "t.mesha15@sistemafiea.com.br",
+            "homepage": "https://www.linkedin.com/in/matheus-melo-7198901a4",
+            "role": "Developer"
+        },
+        {
+            "name": "Bruno Pereira",
+            "email": "batlopes@yahoo.com.br",
+            "homepage": "https://www.linkedin.com/in/batlopes",
+            "role": "Developer"
+        }
+    ]
 }

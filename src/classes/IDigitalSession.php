@@ -13,7 +13,7 @@ class IDigitalSession implements IIDigitalSession {
         }
     }
 
-    public function destroy(): void {
+    public function flush(): void {
         if ($this->alreadyExists()) {
             unset($_SESSION[$this->NAME]);
         }
