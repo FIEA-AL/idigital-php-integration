@@ -34,7 +34,7 @@ class IDigital {
     /**
      * @throws Exception
      */
-    public function authorize(?IIDigitalSession $session): string {
+    public function authorize(?IIDigitalSession $session = null): string {
         $authorizationEndpoint = $this->discovery->authorization_endpoint;
         $pkceKeysPair = IDigitalHelp::getPkceKeysPair();
         $nonce = IDigitalHelp::getRandomBytes();
@@ -63,7 +63,7 @@ class IDigital {
     /**
      * @throws IDigitalException
      */
-    public function callback(string $code, string $issuer, string $state, ?IIDigitalSession $session): object {
+    public function callback(string $code, string $issuer, string $state, ?IIDigitalSession $session = null): object {
         $IDigitalSession = $this->getSession($session);
 
         if ($issuer !== $this->configs->issuer) {
@@ -89,7 +89,7 @@ class IDigital {
         return $object;
     }
 
-    public function isAuthenticated(?IIDigitalSession $session): object {
+    public function isAuthenticated(?IIDigitalSession $session = null): object {
         $IDigitalSession = $this->getSession($session);
         $object = new stdClass();
 
@@ -113,7 +113,7 @@ class IDigital {
     /**
      * @throws IDigitalException
      */
-    public function logout(?IIDigitalSession $session, ?callable $afterSessionDestroyFn): string {
+    public function logout(?IIDigitalSession $session = null, ?callable $afterSessionDestroyFn = null): string {
         $IDigitalSession = $this->getSession($session);
 
         if ($this->isAuthenticated($IDigitalSession)->status) {
@@ -138,7 +138,7 @@ class IDigital {
     /**
      * @throws IDigitalException
      */
-    private function getTokens(string $code, ?IIDigitalSession $session): object {
+    private function getTokens(string $code, ?IIDigitalSession $session = null): object {
         $tokenEndpoint = $this->discovery->token_endpoint;
         $IDigitalSession = $this->getSession($session);
 
