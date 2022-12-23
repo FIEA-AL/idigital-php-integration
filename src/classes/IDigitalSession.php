@@ -26,8 +26,7 @@ class IDigitalSession implements IIDigitalSession {
     public function get(string $key, $default = null) {
         if (!$this->alreadyExists()) $this->start();
         $value = $_SESSION[$this->NAME][$key];
-        return $value ?? is_callable($default)
-            ? $default() : $default ?? null;
+        return $value ?? (is_callable($default) ? $default() : $default ?? null);
     }
 
     public function del(string $key): void {
@@ -38,7 +37,7 @@ class IDigitalSession implements IIDigitalSession {
     public function put(string $key, $value) {
         if (!$this->alreadyExists()) $this->start();
         $_SESSION[$this->NAME][$key] = $value;
-        return $this->get($key);
+        return $value;
     }
 
     public function pull(string $key, $default = null) {
