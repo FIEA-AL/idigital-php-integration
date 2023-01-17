@@ -1,11 +1,11 @@
 <?php
 
 namespace Fiea\classes;
-
 use Fiea\interfaces\IIDigitalSession;
 
 class IDigitalConfig {
     public string $issuer;
+    public $session = null;
     public string $clientId;
     public array $scopes = [];
     public ?string $grantType;
@@ -13,7 +13,6 @@ class IDigitalConfig {
     public ?string $responseType;
     public string $applicationHost;
     public ?string $applicationType;
-    public ?IIDigitalSession $session;
     public ?string $codeChallengeMethod;
     public ?string $postLogoutRedirectUri;
     public ?string $tokenEndpointAuthMethod;
