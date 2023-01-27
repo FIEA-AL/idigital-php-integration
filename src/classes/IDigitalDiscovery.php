@@ -19,6 +19,7 @@ class IDigitalDiscovery {
     public bool $claims_parameter_supported;
     public bool $request_parameter_supported;
     public bool $backchannel_logout_supported;
+    public ?string $credential_manager_endpoint;
     public bool $request_uri_parameter_supported;
     public bool $require_request_uri_registration;
     public array $code_challenge_methods_supported;

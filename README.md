@@ -103,6 +103,7 @@ $ composer install
 ## Contributors
 - [Bruno Pereira](https://www.linkedin.com/in/batlopes)
 - [Vitor Barcelos](https://www.linkedin.com/in/vitorbarcelos)
+- [Genildo Rodrigues](https://www.linkedin.com/in/genildorodrigues)
 
 ## License
 

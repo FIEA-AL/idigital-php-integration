@@ -17,6 +17,13 @@ class IDigitalHttp {
     /**
      * @throws IDigitalException
      */
+    public static function getPaserks(?string $url): object {
+        return self::get($url);
+    }
+
+    /**
+     * @throws IDigitalException
+     */
     public static function getJwks(string $url): object {
         return self::get($url);
     }

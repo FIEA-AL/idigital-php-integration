@@ -16,6 +16,7 @@ class IDigitalConfig {
     public ?string $codeChallengeMethod;
     public ?string $postLogoutRedirectUri;
     public ?string $tokenEndpointAuthMethod;
+    public bool $useCredentialToken = false;
 
     public function __construct($configs) {
         $this->issuer = $configs['issuer'];
@@ -28,6 +29,7 @@ class IDigitalConfig {
         $this->responseType = $configs['responseType'] ?? 'code';
         $this->applicationType = $configs['applicationType'] ?? 'web';
         $this->grantType = $configs['grantType'] ?? 'authorization_code';
+        $this->useCredentialToken = $configs['useCredentialToken'] ?? false;
         $this->scopes = $configs['scopes'] ?? ['openid', 'profile', 'email'];
         $this->codeChallengeMethod = $configs['codeChallengeMethod'] ?? 'S256';
         $this->tokenEndpointAuthMethod = $configs['tokenEndpointAuthMethod'] ?? 'none';

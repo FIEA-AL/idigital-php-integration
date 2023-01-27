@@ -1,6 +1,7 @@
 <?php
 
 namespace Fiea;
+use Fiea\classes\IDigitalPasetoToken;
 use Fiea\interfaces\IIDigitalSession;
 use Fiea\classes\IDigitalAccessToken;
 use Fiea\classes\IDigitalDiscovery;
@@ -16,7 +17,8 @@ use stdClass;
 class IDigital {
     private IDigitalDiscovery $discovery;
     private IDigitalConfig $configs;
-	private object $jwks;
+    private ?object $paserks;
+    private object $jwks;
 
     private function __construct(IDigitalConfig $configs) {
         $this->configs = $configs;
@@ -81,8 +83,10 @@ class IDigital {
         $tokens = $this->getTokens($code, $IDigitalSession);
         $object->idToken = IDigitalIDToken::verify($tokens->id_token, $nonce, $this->jwks, $this->configs);
         $object->accessToken = IDigitalAccessToken::verify($tokens->access_token, $this->jwks, $this->configs);
+        $object->credentialToken = IDigitalPasetoToken::verify($tokens->credential_token ?? null, $this->paserks, $this->configs);
 
         // Update session object with provider response
+        $IDigitalSession->put('credentialToken', $tokens->credential_token ?? null);
         $IDigitalSession->put('accessToken', $tokens->access_token);
         $IDigitalSession->put('idToken', $tokens->id_token);
         $IDigitalSession->put('code', $code);
@@ -97,14 +101,17 @@ class IDigital {
             $nonce = $IDigitalSession->get('nonce');
             $idToken = $IDigitalSession->get('idToken');
             $accessToken = $IDigitalSession->get('accessToken');
+            $credentialToken = $IDigitalSession->get('credentialToken');
 
             $object->idToken = IDigitalIDToken::verify($idToken, $nonce, $this->jwks, $this->configs);
             $object->accessToken = IDigitalAccessToken::verify($accessToken, $this->jwks, $this->configs);
+            $object->credentialToken = IDigitalPasetoToken::verify($credentialToken, $this->paserks, $this->configs);
             $object->status = true;
         } catch (Exception $e) {
             $object->status = false;
             $object->idToken = null;
             $object->accessToken = null;
+            $object->credentialToken = null;
         }
 
         return $object;
@@ -162,6 +169,7 @@ class IDigital {
      */
     private function prepare(): void {
         $this->discovery = $this->getDiscovery();
+        $this->paserks = $this->getPaserks();
         $this->jwks = $this->getJwks();
     }
 
@@ -173,6 +181,12 @@ class IDigital {
         $pathname = IDigitalDiscovery::$PATHNAME;
         $url = join('/', [$issuer, $pathname]);
         return IDigitalHttp::getDiscovery($url);
+    }
+
+    private function getPaserks(): ?object {
+        $url = $this->discovery->credential_manager_endpoint;
+        $response = IDigitalHttp::getPaserks($url);
+        return $response ?? null;
     }
 
     /**

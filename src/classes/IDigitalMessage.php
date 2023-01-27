@@ -3,8 +3,10 @@
 namespace Fiea\classes;
 
 class IDigitalMessage {
+    public static string $EXPIRED_TOKEN = 'O token enviado está expirado.';
     public static string $REQUIRED_SESSION = 'O uso de sessão é obrigatório.';
     public static string $INVALID_JWT = 'O token em análise não é um JWT válido.';
+    public static string $REQUIRED_CREDENTIAL_TOKEN = 'É obrigatório o uso da credencial.';
     public static string $DIVERGENT_CLIENT_ID = 'O ID do cliente não pertence ao servidor.';
     public static string $DIVERGENT_NONCE = 'A propriedade nonce enviada difere da armazenada.';
     public static string $DIVERGENT_STATE = 'A propriedade state enviada difere da armazenada.';
@@ -17,4 +19,5 @@ class IDigitalMessage {
     public static string $COULD_NOT_GENERATE_BYTES = 'O servidor não conseguiu gerar valores aleatórios.';
     public static string $HTTP_ERROR = 'Não foi possível realizar a requisição para o servidor de destino.';
     public static string $COULD_NOT_FIND_PUBLIC_KEYS = 'O servidor não conseguiu encontrar chaves públicas.';
+    public static string $REQUIRED_PASETO_ATTRIBUTES = 'A propriedade attributes é obrigatória em um token PASETO.';
 }
