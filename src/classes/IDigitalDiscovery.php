@@ -49,6 +49,7 @@ class IDigitalDiscovery {
         $this->request_parameter_supported = $discovery->request_parameter_supported;
         $this->backchannel_logout_supported = $discovery->backchannel_logout_supported;
         $this->request_uri_parameter_supported = $discovery->request_uri_parameter_supported;
+        $this->credential_manager_endpoint = $discovery->credential_manager_endpoint ?? null;
         $this->require_request_uri_registration = $discovery->require_request_uri_registration;
         $this->code_challenge_methods_supported = $discovery->code_challenge_methods_supported;
         $this->dpop_signing_alg_values_supported = $discovery->dpop_signing_alg_values_supported;

@@ -1,6 +1,7 @@
 <?php
 
 namespace Fiea\classes;
+use ParagonIE\Paseto\Exception\PasetoException;
 use function hash_equals;
 
 class IDigitalPasetoRules implements ValidationRuleInterface {
@@ -45,7 +46,7 @@ class IDigitalPasetoRules implements ValidationRuleInterface {
                 $this->failure = IDigitalMessage::$REQUIRED_PASETO_ATTRIBUTES;
                 return false;
             }
-        } catch (PasetoException $e) {
+        } catch (PasetoException | Exception $e) {
             $this->failure = $e->getMessage();
             return false;
         }
