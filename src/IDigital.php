@@ -142,6 +142,10 @@ class IDigital {
         }
     }
 
+    public function getCredentialKeys(): ?object {
+        return $this->paserks;
+    }
+
     /**
      * @throws IDigitalException
      */
