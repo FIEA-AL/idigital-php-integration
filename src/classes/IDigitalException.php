@@ -23,6 +23,6 @@ class IDigitalException extends Exception {
     }
 
     public function __toString() {
-        return __CLASS__ . ": [{$this->date}: {$this->code} - {$this->name}]: {$this->message}\n";
+        return __CLASS__ . ": [$this->date: $this->code - $this->name]: $this->message\n";
     }
 }

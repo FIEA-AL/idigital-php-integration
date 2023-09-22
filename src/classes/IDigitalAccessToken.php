@@ -9,7 +9,7 @@ class IDigitalAccessToken extends IDigitalToken {
     /**
      * @throws IDigitalException
      */
-    public static function verify(?string $token, $keys, $options): ?object {
+    public static function verify(?string $token, $keys, array $options): ?object {
         if ($token !== null && IDigitalHelp::isJWT($token)) {
             $header = self::getHeader($token, 'at+jwt');
             $kid = $header->kid;
@@ -19,9 +19,9 @@ class IDigitalAccessToken extends IDigitalToken {
             $jwk = JWK::parseKey((array) $publicKey);
             $payload = JWT::decode($token, $jwk);
 
-            self::verifyAudience($payload->aud, $options->applicationHost);
-            self::verifyClient($payload->client_id, $options->clientId);
-            self::verifyIssuer($payload->iss, $options->issuer);
+            self::verifyAudience($payload->aud, $options['applicationHost']);
+            self::verifyClient($payload->client_id, $options['clientId']);
+            self::verifyIssuer($payload->iss, $options['issuer']);
 
             $object = new stdClass();
             $object->header = $header;

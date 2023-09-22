@@ -20,7 +20,7 @@ class IDigitalSession implements IIDigitalSession {
     }
 
     public function alreadyExists(): bool {
-        return isset($_SESSION) && isset($_SESSION[$this->NAME]);
+        return isset($_SESSION[$this->NAME]);
     }
 
     public function get(string $key, $default = null) {
